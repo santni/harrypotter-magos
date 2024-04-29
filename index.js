@@ -4,7 +4,7 @@ const { Pool } = require('pg');
 const app = express();
 const port = 4000;
 
-//let sangue = ['Puro', 'Mestiço', 'Trouxa];
+//let sangues = ['Puro', 'Mestiço', 'Trouxa];
 // if (!sangue include(sangue));
 
 app.use(express.json());
@@ -17,14 +17,24 @@ const pool = new Pool({
   port: 7007
 });
 
-// 🧙✨ ROTAS PARA OS MAGOS:
+// 🧙✨ ROTAS PARA OS MAGOS: ✨🧙
 
 // Rota para criar um mago:
 app.post('/personagens', async (req, res) => {
   const { nome, idade, casa, habilidade, sangue } = req.body;
-  const query = 'INSERT INTO personagens (nome, idade, casa, habilidade, sangue) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
+  const query = 'INSERT INTO personagens (nome, idade, casa, habilidade, sangue) VALUES ($1, $2, $3, $4, $5) RETURNING *';
   const values = [nome, idade, casa, habilidade, sangue];
 
+  let sangues=['puro', 'mestiço', 'trouxa', 'Puro', 'Mestiço', 'Trouxa'];
+  let casas=['grifinória', 'sonserina', 'lufa-lufa', 'corvinal', 'Grifinória', 'Sonserina', 'Lufa-Lufa', 'Corvinal'];
+
+  if(!sangues.includes(sangue)){
+      return res.status(400).send({ message: 'Status de Sangue inválido. Digite algo válido.'})
+  }
+
+  if(!casas.includes(casa)){
+      return res.status(400).send({ message: 'Casa de Hogwarts inválida. Digite algo válido.'})
+  }
   try {
     const result = await pool.query(query, values);
     res.status(201).json(result.rows[0]);
@@ -49,7 +59,7 @@ app.get('/personagens', async (req, res) => {
 app.put('/personagens/:id', async (req, res) => {
   const id = req.params.id;
   const { nome, idade, casa, habilidade, sangue } = req.body;
-  const query = 'UPDATE personagens SET nome=$1, idade=$2, casa=$3, habilidade=$4, sangue=$5=$6 WHERE id=$7';
+  const query = 'UPDATE personagens SET nome=$1, idade=$2, casa=$3, habilidade=$4, sangue=$5 WHERE id=$6';
   const values = [nome, idade, casa, habilidade, sangue, id];
 
   try {
@@ -75,7 +85,7 @@ app.delete('/personagens/:id', async (req, res) => {
   }
 });
 
-// 🧙✨ ROTAS PARA AS VARINHAS:
+// ✨ ROTAS PARA AS VARINHAS: ✨
 
 // Rota para criar uma nova varinha:
 app.post('/varinhas', async (req, res) => {
